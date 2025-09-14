@@ -31,6 +31,10 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="BackChain.cpp" />
+		<Unit filename="BackChain.h" />
+		<Unit filename="ForwardChain.cpp" />
+		<Unit filename="ForwardChain.h" />
 		<Unit filename="main.cpp" />
 		<Extensions>
 			<lib_finder disable_auto="1" />
