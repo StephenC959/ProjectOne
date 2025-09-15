@@ -7,9 +7,14 @@
 
 using namespace std;
 
+
+
 int main(){
-    cout <<"This is the start\n";
-    basicFunction();
+
+    //Each rule is its own diagnoses
+
     return 0;
 }
+
+
 

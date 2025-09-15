@@ -1,21 +1,41 @@
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include <string>
+#include <queue>
+
+using namespace std;
+//function prototypes
+double search_cvl();
+void clause_to_rule(int Ci, string rules[9], string clause[9][3]);
+bool validate_Ri(int Ri, string rules[9], string clause[9][3]);
+void update_VL();
+bool process();
+//global variables
+queue<string> conclusionVarQ;
+vector<string> knownVariables = {};
+vector<string> derivedConclusionList = {};
 /*1. search_cvl (double variable): This function will search for an entry in the
 clause variable list and, find the entry that matches the argument variable,
 and return the clause number, Ci, corresponding to the matching entry.
 Then, first call update_VL (Ci). Then call clause_to_rule (Ci): */
 
+double search_cvl(int){
+
+};
+
 /*2. clause_to_rule (integer variable): - This function will convert Clause
 number, Ci, to rule number, Ri, using the following formula. After
-computing the value of Ri, it will call validate_Ri (Ri):
-If the clause numbers in the clause variable list are sequenced like
-1,2,3,4,5, ......), the formula is:
-Rule # = [({Quotient (Clause # / 4)} +1)]
+computing the value of Ri, it will call validate_Ri (Ri)*/
 
-If the rule numbers are sequenced like 10,20,30,40,50, ......), the formula is:
-Rule # = [({Quotient (Clause # / 4)} +1) * 10]
+void clause_to_rule(int Ci, string rules[9], string clause[9][3]){
+    int Ri = ((Ci / 9) + 1) * 10;
 
-It has been assumed that four slots have been assigned for each rule in the
-Clause Variable list. If a number other than four has been assigned, replace
-4 with that number.*/
+    if(validate_Ri(Ri, rules, clause))
+        validate_Ri(Ri, rules, clause);
+    else
+        cout << "Unsuccessful!" << endl;
+};
 
 /*3. update_VL (integer variable): For each variable (maximum of four)
 starting location Ci, it will check whether the variable is instantiated in the
@@ -26,6 +46,24 @@ instantiate them.*/
 in the ‘if’ clauses of the rule, Ri, are satisfied with the values in the variable
 list. If they do, add the rule's conclusion to the ‘global’ derived conclusion
 list and the Global Conclusion Variable Queue and return.*/
+bool validate_Ri(int Ri, string rules[9], string clause[9][3]){
+    int RiIndex = (Ri / 10) - 1;
+    bool valid = true;
+
+    if(!rules[Ri].empty()){
+        if(std::find(knownVariables.begin(), knownVariables.end(),rules[Ri]) == knownVariables.end()){
+            valid = false;
+        }
+    }
+    if(valid){
+        for(int i = 0; i < 3; i++){
+            if(!clause[Ri][i].empty())
+                conclusionVarQ.push(clause[Ri][i]);
+        }
+        return true;
+    }
+    return false;
+};
 
 /*5. process (variable)
 a. Instantiate the value of the variable in the variable list. Call
@@ -52,3 +90,38 @@ variable list. After the function returns, it will delete the
 variable from the Global Conclusion Variable Queue.
 c. Print all the derived conclusions from the Derived
 Conclusion List*/
+
+
+int FCmain(){
+
+
+
+    string rules[9] = {
+        "Schizophrenia",                    //rule 10
+        "Schizo-Affective Disorder",        //rule 20
+        "Major Depressive Disorder",        //rule 30
+        "Bipolar Disorder",                 //rule 40
+        "Dysthymia",                        //rule 50
+        "Generalized Anxiety Disorder",     //rule 60
+        "Panic Disorder with Agoraphobia",  //rule 70
+        "Dissociative Identity Disorder",   //rule 80
+        "No Diagnoses"                      //rule 90
+    };
+    //Clauses for each rule
+    string clauses[9][3]{
+        {"Antipsychotic	Medication","Social Support",""},           //rule 10
+        {"Antipsychotic	Medication","Mood Stabilizers","Therapy"},  //rule 20
+        {"Psychotherapy","SSRIs/SNRIs",""},                         //rule 30
+        {"Psychotherapy","Sleep Regulation","Mood Stabilizers"},    //rule 40
+        {"Long Term Therapy","SSRIs/SNRIs",""},                     //rule 50
+        {"SSRIs/SNRIs","",""},                                      //rule 60
+        {"SSRIs/SNRIs","",""},                                      //rule 70
+        {"Therapy","Long Term Psychotherapy",""},                   //rule 80
+        {"No Treatments Needed","",""}                              //rule 90
+    };
+
+    //TODO add known variables to global knownVariables
+
+
+    return 0;
+}
