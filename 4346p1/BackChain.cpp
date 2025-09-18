@@ -88,13 +88,13 @@ int BCmain(){
         "No Diagnoses"                      //rule 90
     };
     //Rules for each clause
-    string rules [9][3] = {
+    string rules [9][5] = {
         {"Feels sick","Having hallucinations",""},                                //rule 10
-        {"Feels sick","Unusually sad/tired","Having hallucinations"},             //rule 20
-        {"Feels sick","Unusually sad/tired",""},                                  //rule 30
-        {"Feels sick","Unusually sad/tired","Bouts of elation/mania",},           //rule 40
+        {"Feels sick","Unusually sad/tired","Having hallucinations", "Depressive spurts not intermittent", "Bouts of elation/mania"},             //rule 20
+        {"Feels sick","Unusually sad/tired","Depressive spurts not intermittent", "No bouts of elation/mania"},                                  //rule 30
+        {"Feels sick","Unusually sad/tired","Bouts of elation/mania","No hallucinations"},           //rule 40
         {"Feels sick","Unusually sad/tired","Depressive spurts intermittent"},    //rule 50
-        {"Feels sick","Feels anxious",""},                                        //rule 60
+        {"Feels sick","Feels anxious","No blurred sense of personality", "Crowds don't cause anxiety"},                                        //rule 60
         {"Feels sick","Feels anxious","Crowds cause anxiety"},                                      //rule 70
         {"Feels sick","Feels anxious","Blurred sense of personality"},                   //rule 80
         {"Doesn't feel sick","",""}                              //rule 90
