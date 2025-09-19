@@ -6,35 +6,35 @@
 
 using namespace std;
 //function prototypes
-double search_cvl();
-void clause_to_rule(int Ci, string rules[9], string clause[9][3]);
-bool validate_Ri(int Ri, string rules[9], string clause[9][3]);
+void search_cvl(double Ci);
+void clause_to_rule(int Ci);
+bool validate_Ri(int Ri);
 void update_VL();
 bool process();
+
 //global variables
-queue<string> conclusionVarQ;
-vector<string> knownVariables = {};
+queue<string> conclusionVarQ= {};
+vector<string> clauseVarList;
+vector<string> rulesVarList;
 vector<string> derivedConclusionList = {};
+
 /*1. search_cvl (double variable): This function will search for an entry in the
 clause variable list and, find the entry that matches the argument variable,
 and return the clause number, Ci, corresponding to the matching entry.
 Then, first call update_VL (Ci). Then call clause_to_rule (Ci): */
 
-double search_cvl(int){
-
+void search_cvl(string diagnoses){
+    for(int i)
 };
 
 /*2. clause_to_rule (integer variable): - This function will convert Clause
 number, Ci, to rule number, Ri, using the following formula. After
 computing the value of Ri, it will call validate_Ri (Ri)*/
 
-void clause_to_rule(int Ci, string rules[9], string clause[9][3]){
-    int Ri = ((Ci / 9) + 1) * 10;
-
-    if(validate_Ri(Ri, rules, clause))
-        validate_Ri(Ri, rules, clause);
-    else
-        cout << "Unsuccessful!" << endl;
+void clause_to_rule(int Ci){
+    int numSlots = 1;
+    int Ri = ((Ci / numSlots) + 1) * 10;
+    validate_Ri(Ri);
 };
 
 /*3. update_VL (integer variable): For each variable (maximum of four)
@@ -46,23 +46,16 @@ instantiate them.*/
 in the ‘if’ clauses of the rule, Ri, are satisfied with the values in the variable
 list. If they do, add the rule's conclusion to the ‘global’ derived conclusion
 list and the Global Conclusion Variable Queue and return.*/
-bool validate_Ri(int Ri, string rules[9], string clause[9][3]){
-    int RiIndex = (Ri / 10) - 1;
-    bool valid = true;
+void validate_Ri(int Ri){
 
-    if(!rules[Ri].empty()){
-        if(std::find(knownVariables.begin(), knownVariables.end(),rules[Ri]) == knownVariables.end()){
-            valid = false;
+
+    if(!rulesVarList[Ri].empty()){
+        if((rulesVarList.find(Ri)) == rulesVarList.end()){
+            conclusionVarQ.push(rulesVarList.at(Ri));
+            derivedConclusionList.push_back(rulesVarList.at(Ri));
         }
     }
-    if(valid){
-        for(int i = 0; i < 3; i++){
-            if(!clause[Ri][i].empty())
-                conclusionVarQ.push(clause[Ri][i]);
-        }
-        return true;
-    }
-    return false;
+
 };
 
 /*5. process (variable)
@@ -96,28 +89,27 @@ int FCmain(){
 
 
 
-    string rules[9] = {
-        "Schizophrenia",                    //rule 10
-        "Schizo-Affective Disorder",        //rule 20
-        "Major Depressive Disorder",        //rule 30
-        "Bipolar Disorder",                 //rule 40
-        "Dysthymia",                        //rule 50
-        "Generalized Anxiety Disorder",     //rule 60
-        "Panic Disorder with Agoraphobia",  //rule 70
-        "Dissociative Identity Disorder",   //rule 80
-        "No Diagnoses"                      //rule 90
-    };
+    rulesVarList =     {"Antipsychotic Medication","Social Support","",                //rule 1-4
+                        "Antipsychotic Medication","Mood Stabilizers","Therapy",       //rule 5-8
+                        "Psychotherapy","SSRIs/SNRIs","",                              //rule 9-12
+                        "Psychotherapy","Sleep Regulation","Mood Stabilizers",         //rule 13-16
+                        "Long Term Therapy","SSRIs/SNRIs","",                          //rule 17-20
+                        "SSRIs/SNRIs","","",                                           //rule 21-24
+                        "SSRIs/SNRIs","","",                                           //rule 24-28
+                        "Therapy","Long Term Psychotherapy","",                        //rule 29-32
+                        "No Treatments Needed","",""};                                 //rule 33-36
+
     //Clauses for each rule
-    string clauses[9][3]{
-        {"Antipsychotic	Medication","Social Support",""},           //rule 10
-        {"Antipsychotic	Medication","Mood Stabilizers","Therapy"},  //rule 20
-        {"Psychotherapy","SSRIs/SNRIs",""},                         //rule 30
-        {"Psychotherapy","Sleep Regulation","Mood Stabilizers"},    //rule 40
-        {"Long Term Therapy","SSRIs/SNRIs",""},                     //rule 50
-        {"SSRIs/SNRIs","",""},                                      //rule 60
-        {"SSRIs/SNRIs","",""},                                      //rule 70
-        {"Therapy","Long Term Psychotherapy",""},                   //rule 80
-        {"No Treatments Needed","",""}                              //rule 90
+    clauseVarList{
+        "Schizoprenia",                             //clause 1
+        "Schizo-Affective Disorder",                //clause 2
+        "Major Depressive Disorder",                //clause 3
+        "Bipolar Disorder",                         //clause 4
+        "Dysthymia",                                //clause 5
+        "Generalized Anxiety Disorder",             //clause 6
+        "Panic Disorder with Agoraphobia",          //clause 7
+        "Dissociative Identity Disorder",           //clause 8
+        "No Diagnoses"                              //clause 9
     };
 
     //TODO add known variables to global knownVariables
