@@ -1,4 +1,11 @@
 #include <iostream>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+vector<string> clauseVarListBC;
+vector<string> rulesVarListBC;
 /*search_con (string variable): with passing the variable as a parameter
 (variable). This function will find the matching variable in the conclusion list
 and the corresponding rule number, Ri.*/
@@ -76,7 +83,7 @@ o call Process ( Goal variable)*/
 
 int BCmain(){
 
-    string clauses[9] = {
+    clauseVarListBC = {
         "Schizophrenia",                    //rule 10
         "Schizo-Affective Disorder",        //rule 20
         "Major Depressive Disorder",        //rule 30
@@ -87,8 +94,9 @@ int BCmain(){
         "Dissociative Identity Disorder",   //rule 80
         "No Diagnoses"                      //rule 90
     };
-    //Rules for each clause
-    string rules [9][5] = {
+    //Rules for each clause(The List cannot look like this for array or vector)
+
+/*    rulesVarListBC = {
         {"Feels sick","Having hallucinations",""},                                //rule 10
         {"Feels sick","Unusually sad/tired","Having hallucinations", "Depressive spurts not intermittent", "Bouts of elation/mania"},             //rule 20
         {"Feels sick","Unusually sad/tired","Depressive spurts not intermittent", "No bouts of elation/mania"},                                  //rule 30
@@ -99,7 +107,7 @@ int BCmain(){
         {"Feels sick","Feels anxious","Blurred sense of personality"},                   //rule 80
         {"Doesn't feel sick","",""}                              //rule 90
     };
-
+*/
     //TODO add known variables to global knownVariables
 
 
@@ -112,6 +120,3 @@ answer to processing the backward chaining. Print the value of the
 variable and pass it to the Forward chaining program. If it is null,
 print a comment that the Goal cannot be determined.*/
 
-void basicFunction(){
-    std::cout << "This Works";
-}

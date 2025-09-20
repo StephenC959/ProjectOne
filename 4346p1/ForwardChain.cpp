@@ -3,28 +3,40 @@
 #include <vector>
 #include <string>
 #include <queue>
+#include <cctype>
 
 using namespace std;
 //function prototypes
-void search_cvl(double Ci);
+int search_cvl(string diagnoses);
 void clause_to_rule(int Ci);
-bool validate_Ri(int Ri);
-void update_VL();
-bool process();
+void validate_Ri(int Ri);
+void update_VL(int Ci);
+void process(string diagnoses);
 
 //global variables
 queue<string> conclusionVarQ= {};
 vector<string> clauseVarList;
 vector<string> rulesVarList;
 vector<string> derivedConclusionList = {};
+vector<string> varList;
 
 /*1. search_cvl (double variable): This function will search for an entry in the
 clause variable list and, find the entry that matches the argument variable,
 and return the clause number, Ci, corresponding to the matching entry.
 Then, first call update_VL (Ci). Then call clause_to_rule (Ci): */
 
-void search_cvl(string diagnoses){
-    for(int i)
+int search_cvl(string diagnoses){
+    //make diagnoses lowercase
+    std::transform(diagnoses.begin(), diagnoses.end(), diagnoses.begin(),
+    [](unsigned char c){ return std::tolower(c); });
+
+    for(int i = 0; i < clauseVarList.size(); i++){
+        if(diagnoses == clauseVarList.at(i)){
+            update_VL(i);
+            clause_to_rule(i);
+            return i;
+        }
+    }
 };
 
 /*2. clause_to_rule (integer variable): - This function will convert Clause
@@ -32,8 +44,8 @@ number, Ci, to rule number, Ri, using the following formula. After
 computing the value of Ri, it will call validate_Ri (Ri)*/
 
 void clause_to_rule(int Ci){
-    int numSlots = 1;
-    int Ri = ((Ci / numSlots) + 1) * 10;
+    int numSlots = 3;
+    int Ri = Ci * numSlots;
     validate_Ri(Ri);
 };
 
@@ -42,19 +54,45 @@ starting location Ci, it will check whether the variable is instantiated in the
 variable list. If not, it will ask the user to provide the variables' values and
 instantiate them.*/
 
+void update_VL(int Ci){
+    bool valid = false;
+
+    for(int i = Ci; i < Ci + 4; i++){
+        for(int j = 0; j < varList.size(); j++){
+            if(clauseVarList.at(i) == varList.at(j) && i < clauseVarList.size()){
+                valid = true;
+                break;
+            }
+        }
+    }
+
+    if(!valid)
+        varList.push_back(clauseVarList.at(Ci));
+}
+
 /*4. validate_Ri (integer variable): It will check if the values of the variable
 in the ‘if’ clauses of the rule, Ri, are satisfied with the values in the variable
 list. If they do, add the rule's conclusion to the ‘global’ derived conclusion
 list and the Global Conclusion Variable Queue and return.*/
 void validate_Ri(int Ri){
+    bool valid = false;
 
+    for(int j = 0; j < varList.size(); j++){
+        if(varList.at(j) == clauseVarList.at(Ri))
+            valid = true;
+    }
 
-    if(!rulesVarList[Ri].empty()){
-        if((rulesVarList.find(Ri)) == rulesVarList.end()){
-            conclusionVarQ.push(rulesVarList.at(Ri));
-            derivedConclusionList.push_back(rulesVarList.at(Ri));
+    if(valid) {
+        for(int i = Ri; i < Ri + 3; i++){
+            if(!rulesVarList.at(i).empty()){
+                conclusionVarQ.push(rulesVarList.at(i));
+                derivedConclusionList.push_back(rulesVarList.at(i));
+            }
         }
     }
+
+
+
 
 };
 
@@ -62,6 +100,22 @@ void validate_Ri(int Ri){
 a. Instantiate the value of the variable in the variable list. Call
 search_cvl(variable)
 b. return*/
+
+void process(string diagnoses){
+    bool exists = false;
+    //check if diagnoses is already in variable list
+    if(varList.size() != 0){
+       for(int i = 0; i < varList.size();i++){
+            if(diagnoses == varList.at(i))
+                exists = true;
+        }
+    }
+    //if not in variable list then push and call search cvl
+    if(!exists){
+       varList.push_back(diagnoses);
+       search_cvl(diagnoses);
+    }
+};
 
 /*6. FC_main function
 Declaration of the FC_main function
@@ -89,31 +143,33 @@ int FCmain(){
 
 
 
-    rulesVarList =     {"Antipsychotic Medication","Social Support","",                //rule 1-4
-                        "Antipsychotic Medication","Mood Stabilizers","Therapy",       //rule 5-8
-                        "Psychotherapy","SSRIs/SNRIs","",                              //rule 9-12
-                        "Psychotherapy","Sleep Regulation","Mood Stabilizers",         //rule 13-16
-                        "Long Term Therapy","SSRIs/SNRIs","",                          //rule 17-20
-                        "SSRIs/SNRIs","","",                                           //rule 21-24
-                        "SSRIs/SNRIs","","",                                           //rule 24-28
-                        "Therapy","Long Term Psychotherapy","",                        //rule 29-32
-                        "No Treatments Needed","",""};                                 //rule 33-36
-
-    //Clauses for each rule
-    clauseVarList{
-        "Schizoprenia",                             //clause 1
-        "Schizo-Affective Disorder",                //clause 2
-        "Major Depressive Disorder",                //clause 3
-        "Bipolar Disorder",                         //clause 4
-        "Dysthymia",                                //clause 5
-        "Generalized Anxiety Disorder",             //clause 6
-        "Panic Disorder with Agoraphobia",          //clause 7
-        "Dissociative Identity Disorder",           //clause 8
-        "No Diagnoses"                              //clause 9
+    rulesVarList =  {
+        "Antipsychotic Medication","Social Support","",                //rule 1-3
+        "Antipsychotic Medication","Mood Stabilizers","Therapy",       //rule 4-6
+        "Psychotherapy","SSRIs/SNRIs","",                              //rule 7-9
+        "Psychotherapy","Sleep Regulation","Mood Stabilizers",         //rule 10-12
+        "Long Term Therapy","SSRIs/SNRIs","",                          //rule 13-15
+        "SSRIs/SNRIs","","",                                           //rule 16-18
+        "SSRIs/SNRIs","","",                                           //rule 19-21
+        "Therapy","Long Term Psychotherapy","",                        //rule 22-24
+        "No Treatments Needed","",""                                   //rule 25-27
     };
 
-    //TODO add known variables to global knownVariables
+    //Clauses for each rule
+    clauseVarList = {
+        "schizoprenia",                             //clause 1
+        "schizo-affective disorder",                //clause 2
+        "major depressive disorder",                //clause 3
+        "bipolar disorder",                         //clause 4
+        "dysthymia",                                //clause 5
+        "generalized anxiety disorder",             //clause 6
+        "panic disorder with agoraphobia",          //clause 7
+        "dissociative identity disorder",           //clause 8
+        "no diagnoses"                              //clause 9
+    };
 
+
+    //implement var queue
 
     return 0;
 }
