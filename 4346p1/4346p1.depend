@@ -4,7 +4,7 @@
 	<vector>
 	<string>
 
-1758327746 source:c:\users\scox1\compsci\ai\project1\4346p1\forwardchain.cpp
+1758394577 source:c:\users\scox1\compsci\ai\project1\4346p1\forwardchain.cpp
 	<iostream>
 	<algorithm>
 	<vector>
@@ -12,12 +12,18 @@
 	<queue>
 	<cctype>
 
-1757966192 source:c:\users\scox1\compsci\ai\project1\4346p1\main.cpp
+1758390790 source:c:\users\scox1\compsci\ai\project1\4346p1\main.cpp
 	<iostream>
 	"BackChain.h"
 	"ForwardChain.h"
 
 1757881647 c:\users\scox1\compsci\ai\project1\4346p1\backchain.h
 
-1757971499 c:\users\scox1\compsci\ai\project1\4346p1\forwardchain.h
+1758394577 c:\users\scox1\compsci\ai\project1\4346p1\forwardchain.h
+	<iostream>
+	<algorithm>
+	<vector>
+	<string>
+	<queue>
+	<cctype>
 

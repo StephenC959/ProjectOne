@@ -12,6 +12,7 @@ using namespace std;
 int main(){
 
     //Each rule is its own diagnoses
+    forwardChainTreatments();
 
     return 0;
 }

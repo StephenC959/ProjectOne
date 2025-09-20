@@ -57,9 +57,9 @@ instantiate them.*/
 void update_VL(int Ci){
     bool valid = false;
 
-    for(int i = Ci; i < Ci + 4; i++){
+    for(int i = Ci; i < Ci + 4  && i < clauseVarList.size(); i++){
         for(int j = 0; j < varList.size(); j++){
-            if(clauseVarList.at(i) == varList.at(j) && i < clauseVarList.size()){
+            if(clauseVarList.at(i) == varList.at(j)){
                 valid = true;
                 break;
             }
@@ -75,11 +75,14 @@ in the ‘if’ clauses of the rule, Ri, are satisfied with the values in the variab
 list. If they do, add the rule's conclusion to the ‘global’ derived conclusion
 list and the Global Conclusion Variable Queue and return.*/
 void validate_Ri(int Ri){
+
     bool valid = false;
 
     for(int j = 0; j < varList.size(); j++){
-        if(varList.at(j) == clauseVarList.at(Ri))
+        if(varList.at(j) == clauseVarList.at(Ri/3)){
             valid = true;
+            break;
+        }
     }
 
     if(valid) {
@@ -110,6 +113,7 @@ void process(string diagnoses){
                 exists = true;
         }
     }
+
     //if not in variable list then push and call search cvl
     if(!exists){
        varList.push_back(diagnoses);
@@ -139,9 +143,7 @@ c. Print all the derived conclusions from the Derived
 Conclusion List*/
 
 
-int FCmain(){
-
-
+void forwardChainTreatments(){
 
     rulesVarList =  {
         "Antipsychotic Medication","Social Support","",                //rule 1-3
@@ -157,7 +159,7 @@ int FCmain(){
 
     //Clauses for each rule
     clauseVarList = {
-        "schizoprenia",                             //clause 1
+        "schizophrenia",                             //clause 1
         "schizo-affective disorder",                //clause 2
         "major depressive disorder",                //clause 3
         "bipolar disorder",                         //clause 4
@@ -168,8 +170,43 @@ int FCmain(){
         "no diagnoses"                              //clause 9
     };
 
+    string done = "not";
+    string input;
+    string next;
+    vector<string> testCase = {};
 
-    //implement var queue
 
-    return 0;
+//get diagnoses
+    while(done != "done"){
+            cout << "Enter Diagnoses:(Enter 'done' when done) " << endl;
+            getline(cin, input);
+            if(input != "done"){
+                testCase.push_back(input);
+            }
+            else{
+                done = "done";
+            }
+    }
+
+//load global conclusion variable queue
+    for(int i = 0; i < testCase.size(); i++){
+        if(!testCase.at(i).empty()){
+            process(testCase.at(i));
+        }
+    }
+
+//process all variables
+    while(!conclusionVarQ.empty()){
+            next = conclusionVarQ.front();
+            conclusionVarQ.pop();
+            process(next);
+    }
+
+//print all of the derived conclusions
+    cout << "Recommended treatments: " << endl;
+    if(derivedConclusionList.empty())
+        cout << "No Diagnoses Provided";
+    for(int i = 0; i < derivedConclusionList.size(); i++){
+        cout << derivedConclusionList.at(i) << endl;
+    }
 }
