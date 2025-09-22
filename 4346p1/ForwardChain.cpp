@@ -37,6 +37,7 @@ int search_cvl(string diagnoses){
             return i;
         }
     }
+    return 0;
 };
 
 /*2. clause_to_rule (integer variable): - This function will convert Clause
@@ -71,8 +72,8 @@ void update_VL(int Ci){
 }
 
 /*4. validate_Ri (integer variable): It will check if the values of the variable
-in the ‘if’ clauses of the rule, Ri, are satisfied with the values in the variable
-list. If they do, add the rule's conclusion to the ‘global’ derived conclusion
+in the ï¿½ifï¿½ clauses of the rule, Ri, are satisfied with the values in the variable
+list. If they do, add the rule's conclusion to the ï¿½globalï¿½ derived conclusion
 list and the Global Conclusion Variable Queue and return.*/
 void validate_Ri(int Ri){
 
@@ -123,14 +124,14 @@ void process(string diagnoses){
 
 /*6. FC_main function
 Declaration of the FC_main function
-• Write functions’ prototypes.
-• Declare variables and arrays.
-• Create a list of rules. It may need some organization. Determine
+ï¿½ Write functionsï¿½ prototypes.
+ï¿½ Declare variables and arrays.
+ï¿½ Create a list of rules. It may need some organization. Determine
 which format you want to use for efficient processing by the
 Validate_Ri function.
-• Create a Variable List as an array.
-• Create a Clause Variable list as an array.
-• Create a Global Conclusion variable queue as an array.
+ï¿½ Create a Variable List as an array.
+ï¿½ Create a Clause Variable list as an array.
+ï¿½ Create a Global Conclusion variable queue as an array.
 Processing of the main function:
 a. Read the value of the given variable (the variable whose value is
 provided) and call process (variable)

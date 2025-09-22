@@ -12,9 +12,9 @@ using namespace std;
 int main(){
 
     //Each rule is its own diagnoses
-    forwardChainTreatments();
+   forwardChainTreatments();
 
-    return 0;
+   return 0;
 }
 
 

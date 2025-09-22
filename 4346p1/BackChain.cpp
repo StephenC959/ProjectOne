@@ -1,122 +1,186 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <map>
 
 using namespace std;
 
-vector<string> clauseVarListBC;
-vector<string> rulesVarListBC;
-/*search_con (string variable): with passing the variable as a parameter
-(variable). This function will find the matching variable in the conclusion list
-and the corresponding rule number, Ri.*/
+// --- Global Data Structures ---
+// A map to link a diagnosis (conclusion) to its rule number
+map<string, int> bc_conclusion_map;
+// A map to link a rule number to its "if" clauses (symptoms)
+map<int, vector<string>> bc_rules;
+// A map to store variables (symptoms) and their values ("yes" or "no")
+map<string, string> bc_variable_list;
+// A map to store variables that have been proven
+map<string, string> bc_derived_global_variable_list;
 
+const int SLOTS_PER_RULE = 4;
 
-/*2. rule_to_clause (integer variable): - This function will convert Rule # Ri
-to clause number Ci using the following formula. If the rule numbers are
-sequenced like 1,2,3,4,5, ......), formula is:
+// --- Function Prototypes ---
+int search_con(const string& variable);
+int rule_to_clause(int ruleNumber);
+void update_VL(int ruleNumber);
+bool validate_Ri(int ruleNumber, string& conclusion);
+void Process(const string& variable);
 
-CLAUSE NUMBER (Ci) = 4* (RULE NUMBER (Ri) - 1) + 1
-If the rule numbers are sequenced like 10,20,30,40,50, ......), formula is:
-CLAUSE NUMBER = 4* (RULE NUMBER / 10 - 1) + 1
+// --- Backward Chaining Function Implementations ---
 
-It has been assumed that four slots have been assigned for each rule in the
-Clause Variable list. If a ‘number’ other than four has been assigned,
-replace 4 with that number.*/
-
-/*3. update_VL (integer variable): with passing Ci to it. It will all questions
-and will instantiate all (maximum of 4) variables starting from the location
-Ci in the variable list. If the variable is not in the variable list, it could be in
-the then clause of some rule. call Process (variable) to find its value-it will
-be a recursive call.*/
-
-
-/*4. validate_Ri (integer variable, string conclusion): with passing, Ri,
-to it. It will check if the values of the variables in the ‘if’ clauses of
-the rule, Ri, are satisfied with the values in the variable list and
-the derived global variable list. If they do, it will assign the
-conclusion of the rule to the variable conclusion; otherwise, it will
-not assign any value, and then it will return.*/
-
-
-/*5. Process (variable)
-o Start a loop. In each cycle of the loop, do the following:
-o call search_con (variable) by passing the goal variable as a parameter
-(variable). It will find the matching variable in the conclusion list and
-the corresponding rule number, Ri.
-o call Rule_to_clause (Ri) by passing Ri as a parameter. This function
-will convert the rule number, Ri, to clause number, Ci.
-o call Update_VL (Ci) with passing Ci to it. It may ask questions and will
-instantiate all (maximum of 4) variables starting from the location Ci
-in the variable list. If the variable is not in the variable list, it could be
-in the then clause of some rule. call Process (variable) to find its
-value-it will be a recursive call.
-o Initialize conclusion to null and call Validate_Ri (Ri,
-Conclusion) with passing, Ri, to it. This function will check if
-the values of the variables in the ‘if’ clauses of the rule, Ri,
-are satisfied with the values in the variable list and the
-derived global variable list. If they do, it will assign the
-conclusion of the rule to the conclusion variable. Save the
-value of the conclusion variable in the derived global
-variable list and return. If the values of the variables in the
-‘if’ clauses of the rule, Ri, are not satisfied with the values in
-the variable list and the derived global variable list, use the
-‘continue’ statement to continue the loop. It will repeat the
-process with the next entry of the conclusion list.*/
-
-
-/*6. main function
-Declaration
-(you are allowed to declare variables and lists global)
-• Write functions’ prototypes
-• Declare variables and arrays
-• Create a list of rules. It may need some organization. Determine
-which format you want to use for efficient processing by the
-Validate_Ri function.
-• Create a Variable List (could be an array).
-• Create a conclusion list (could be an array).
-• Create a Clause Variable list (could be an array).
-• Create the Derived Global Variable list.
-Processing in the main function:
-o Identify the Goal variable (the variable whose value needs to be
-determined)
-o call Process ( Goal variable)*/
-
-int BCmain(){
-
-    clauseVarListBC = {
-        "Schizophrenia",                    //rule 10
-        "Schizo-Affective Disorder",        //rule 20
-        "Major Depressive Disorder",        //rule 30
-        "Bipolar Disorder",                 //rule 40
-        "Dysthymia",                        //rule 50
-        "Generalized Anxiety Disorder",     //rule 60
-        "Panic Disorder with Agoraphobia",  //rule 70
-        "Dissociative Identity Disorder",   //rule 80
-        "No Diagnoses"                      //rule 90
-    };
-    //Rules for each clause(The List cannot look like this for array or vector)
-
-/*    rulesVarListBC = {
-        {"Feels sick","Having hallucinations",""},                                //rule 10
-        {"Feels sick","Unusually sad/tired","Having hallucinations", "Depressive spurts not intermittent", "Bouts of elation/mania"},             //rule 20
-        {"Feels sick","Unusually sad/tired","Depressive spurts not intermittent", "No bouts of elation/mania"},                                  //rule 30
-        {"Feels sick","Unusually sad/tired","Bouts of elation/mania","No hallucinations"},           //rule 40
-        {"Feels sick","Unusually sad/tired","Depressive spurts intermittent"},    //rule 50
-        {"Feels sick","Feels anxious","No blurred sense of personality", "Crowds don't cause anxiety"},                                        //rule 60
-        {"Feels sick","Feels anxious","Crowds cause anxiety"},                                      //rule 70
-        {"Feels sick","Feels anxious","Blurred sense of personality"},                   //rule 80
-        {"Doesn't feel sick","",""}                              //rule 90
-    };
+/*
+* 1. search_con(string variable): Finds the rule that concludes the given variable (goal).
 */
-    //TODO add known variables to global knownVariables
+int search_con(const string& variable) {
+    if (bc_conclusion_map.count(variable)) {
+        return bc_conclusion_map.at(variable);
+    }
+    return -1; // Not found
+}
 
+/*
+* 2. rule_to_clause(integer variable): Converts a rule number to its clause number.
+*/
+int rule_to_clause(int ruleNumber) {
+    return SLOTS_PER_RULE * (ruleNumber - 1) + 1;
+}
+
+/*
+* 3. update_VL(integer ruleNumber): Asks the user for symptom values.
+* This is where the questions are asked.
+*/
+void update_VL(int ruleNumber) {
+    auto it = bc_rules.find(ruleNumber);
+    if (it != bc_rules.end()) {
+        const auto& variables = it->second;
+        for (const auto& var : variables) {
+            // Check if the variable is already known
+            if (bc_variable_list.find(var) == bc_variable_list.end()) {
+                // If it's a conclusion of another rule, try to prove it recursively
+                if (bc_conclusion_map.count(var)) {
+                    Process(var);
+                    // If the recursive call succeeds, skip asking
+                    if (bc_variable_list.find(var) != bc_variable_list.end()) {
+                        continue;
+                    }
+                }
+                
+                // If the variable is still unknown, ask the user
+                string answer;
+                cout << "Does the patient have the symptom '" << var << "'? (yes/no): ";
+                cin >> answer;
+                bc_variable_list[var] = (answer == "yes" || answer == "y") ? "yes" : "no";
+            }
+        }
+    }
+}
+
+/*
+* 4. validate_Ri(integer ruleNumber, string& conclusion): Checks if a rule's conditions are met.
+*/
+bool validate_Ri(int ruleNumber, string& conclusion) {
+    if (bc_rules.find(ruleNumber) == bc_rules.end()) {
+        return false;
+    }
+    const auto& conditions = bc_rules.at(ruleNumber);
+    
+    for (const auto& condition : conditions) {
+        if (bc_variable_list.find(condition) == bc_variable_list.end() || bc_variable_list.at(condition) != "yes") {
+            if (bc_derived_global_variable_list.find(condition) == bc_derived_global_variable_list.end() || bc_derived_global_variable_list.at(condition) != "yes") {
+                return false;
+            }
+        }
+    }
+    
+    for (const auto& pair : bc_conclusion_map) {
+        if (pair.second == ruleNumber) {
+            conclusion = pair.first;
+            return true;
+        }
+    }
+    return false;
+}
+
+/*
+* 5. Process(variable): The main backward chaining algorithm.
+*/
+void Process(const string& variable) {
+    cout << "\nStarting backward chaining for goal: " << variable << endl;
+    
+    vector<int> candidate_rules;
+    for (const auto& pair : bc_conclusion_map) {
+        if (pair.first == variable) {
+            candidate_rules.push_back(pair.second);
+        }
+    }
+    
+    if (candidate_rules.empty()) {
+        cout << "No rules found for goal: " << variable << endl;
+        return;
+    }
+
+    for (int ruleNumber : candidate_rules) {
+        update_VL(ruleNumber);
+        
+        string conclusion = "";
+        if (validate_Ri(ruleNumber, conclusion)) {
+            bc_derived_global_variable_list[variable] = conclusion;
+            cout << "Goal '" << variable << "' successfully derived with value: " << conclusion << endl;
+            return;
+        } else {
+            cout << "Rule " << ruleNumber << " failed. Trying next rule if available." << endl;
+        }
+    }
+    
+    cout << "Goal '" << variable << "' could not be determined." << endl;
+}
+
+/*
+* The main function for this module.
+*/
+int main() {
+    // --- Initialize Knowledge Base for Backward Chaining (Diagnosis) ---
+    // The conclusion map links a diagnosis string to its rule number.
+    bc_conclusion_map = {
+        {"Bipolar Disorder", 1},
+        {"Schizophrenia", 2},
+        {"Schizo-Affective Disorder", 3},
+        {"Major Depressive Disorder", 4},
+        {"Panic Disorder with Agoraphobia", 5},
+        {"Dissociative Identity Disorder", 6},
+        {"Dysthymia", 7},
+        {"Generalized Anxiety Disorder", 8}
+    };
+
+    // The rules link a rule number to its "if" clauses (symptoms).
+    bc_rules[1] = {"patient_has_elated_mood", "patient_has_increased_energy", "patient_has_racing_thoughts", "patient_has_mood_swings"};
+    bc_rules[2] = {"patient_has_hallucinations", "patient_has_delusions", "patient_has_disorganized_speech", "patient_has_lack_of_motivation"};
+    bc_rules[3] = {"symptoms_of_schizophrenia", "symptoms_of_depression_or_mania", "persistent_symptoms_for_2_weeks"};
+    bc_rules[4] = {"patient_has_depressed_mood", "patient_has_anhedonia", "patient_has_sleep_disturbances", "patient_has_feelings_of_worthlessness"};
+    bc_rules[5] = {"patient_experiences_panic_attacks", "patient_avoids_crowds", "patient_avoids_open_spaces", "patient_avoids_public_transport"};
+    bc_rules[6] = {"patient_has_amnesia", "patient_feels_detached", "patient_has_blurred_identity", "patient_has_distinct_identities"};
+    bc_rules[7] = {"patient_has_persistent_sadness", "patient_has_low_self_esteem", "patient_avoids_social_activities", "patient_has_poor_appetite_or_overeating"};
+    bc_rules[8] = {"patient_has_persistent_worrying", "patient_has_difficulty_concentrating", "patient_has_muscle_tension", "patient_has_trouble_sleeping"};
+
+    cout << "--- Mental Health Expert System (Backward Chaining) ---" << endl;
+
+    string final_diagnosis = "";
+    string diagnoses_to_try[] = {"Bipolar Disorder", "Schizophrenia", "Major Depressive Disorder", "Panic Disorder with Agoraphobia", "Dissociative Identity Disorder", "Dysthymia", "Generalized Anxiety Disorder", "Schizo-Affective Disorder"};
+    
+    for (const auto& diagnosis_goal : diagnoses_to_try) {
+        bc_variable_list.clear();
+        bc_derived_global_variable_list.clear();
+        Process(diagnosis_goal);
+        
+        if (bc_derived_global_variable_list.count(diagnosis_goal)) {
+            final_diagnosis = bc_derived_global_variable_list[diagnosis_goal];
+            break; 
+        }
+    }
+    
+    if (final_diagnosis.empty()) {
+        cout << "\nNo diagnosis could be determined from the symptoms provided." << endl;
+    } else {
+        cout << "\nFinal Diagnosis: " << final_diagnosis << endl;
+    }
 
     return 0;
 }
-
-/*o After the program is complete, check if the derived global variable
-list contains the goal variable and is not null. If it does, that is the
-answer to processing the backward chaining. Print the value of the
-variable and pass it to the Forward chaining program. If it is null,
-print a comment that the Goal cannot be determined.*/
-
