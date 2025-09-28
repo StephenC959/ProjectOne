@@ -151,14 +151,14 @@ void backwardChainTreatments() {
     };
 
     // The rules link a rule number to its "if" clauses (symptoms).
-    bc_rules[1] = {"patient_has_elated_mood", "patient_has_increased_energy", "patient_has_racing_thoughts", "patient_has_mood_swings"};
-    bc_rules[2] = {"patient_has_hallucinations", "patient_has_delusions", "patient_has_disorganized_speech", "patient_has_lack_of_motivation"};
-    bc_rules[3] = {"symptoms_of_schizophrenia", "symptoms_of_depression_or_mania", "persistent_symptoms_for_2_weeks"};
-    bc_rules[4] = {"patient_has_depressed_mood", "patient_has_anhedonia", "patient_has_sleep_disturbances", "patient_has_feelings_of_worthlessness"};
-    bc_rules[5] = {"patient_experiences_panic_attacks", "patient_avoids_crowds", "patient_avoids_open_spaces", "patient_avoids_public_transport"};
-    bc_rules[6] = {"patient_has_amnesia", "patient_feels_detached", "patient_has_blurred_identity", "patient_has_distinct_identities"};
-    bc_rules[7] = {"patient_has_persistent_sadness", "patient_has_low_self_esteem", "patient_avoids_social_activities", "patient_has_poor_appetite_or_overeating"};
-    bc_rules[8] = {"patient_has_persistent_worrying", "patient_has_difficulty_concentrating", "patient_has_muscle_tension", "patient_has_trouble_sleeping"};
+    bc_rules[0] = {"patient_has_elated_mood", "patient_has_increased_energy", "patient_has_racing_thoughts", "patient_has_mood_swings"};
+    bc_rules[1] = {"patient_has_hallucinations", "patient_has_delusions", "patient_has_disorganized_speech", "patient_has_lack_of_motivation"};
+    bc_rules[2] = {"symptoms_of_schizophrenia", "symptoms_of_depression_or_mania", "persistent_symptoms_for_2_weeks"};
+    bc_rules[3] = {"patient_has_depressed_mood", "patient_has_anhedonia", "patient_has_sleep_disturbances", "patient_has_feelings_of_worthlessness"};
+    bc_rules[4] = {"patient_experiences_panic_attacks", "patient_avoids_crowds", "patient_avoids_open_spaces", "patient_avoids_public_transport"};
+    bc_rules[5] = {"patient_has_amnesia", "patient_feels_detached", "patient_has_blurred_identity", "patient_has_distinct_identities"};
+    bc_rules[6] = {"patient_has_persistent_sadness", "patient_has_low_self_esteem", "patient_avoids_social_activities", "patient_has_poor_appetite_or_overeating"};
+    bc_rules[7] = {"patient_has_persistent_worrying", "patient_has_difficulty_concentrating", "patient_has_muscle_tension", "patient_has_trouble_sleeping"};
 
     cout << "--- Mental Health Expert System (Backward Chaining) ---" << endl;
 
